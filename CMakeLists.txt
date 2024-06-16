@@ -26,6 +26,12 @@ set(IMGUI_SRC
         ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 
+# Texture atlas generator
+set(TAG_DIR ${CMAKE_SOURCE_DIR}/dep/texture-atlas-generator)
+set(TAG_SRC
+        ${TAG_DIR}/library.cpp
+)
+
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/dep/inc)
 
@@ -56,6 +62,7 @@ set(APP_SRC
 add_executable(Material_Painter
         # Dependencies
         ${IMGUI_SRC}
+        ${TAG_SRC}
         ${CMAKE_SOURCE_DIR}/src/glad.c
         # Application
         ${CMAKE_SOURCE_DIR}/src/main.cpp
