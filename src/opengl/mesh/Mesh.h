@@ -11,37 +11,35 @@
 
 template<typename TVertex> requires is_vertex<TVertex>
 class Mesh {
-    std::vector<TVertex> vertices;
-    std::optional<std::vector<unsigned int>> indices;
-public:
     int drawingMode;
+    int indicesCount;
+    int verticesCount;
+public:
 
     explicit Mesh(std::vector<TVertex> vertices = std::vector<TVertex>(), std::optional<std::vector<unsigned int>> indices = {},
-                  int drawingMode = GL_TRIANGLES) : vertices(std::move(vertices)), indices(std::move(indices)), drawingMode(drawingMode) {
-        setupMesh();
+                  int drawingMode = GL_TRIANGLES) : verticesCount(vertices.size()), indicesCount(indices.has_value() ? indices->size() : 0), drawingMode(drawingMode) {
+        setupMesh(std::move(vertices), std::move(indices));
     }
 
     void render(int instanceCount = 1) const {
         // draw mesh
         glBindVertexArray(VAO);
-        if (indices)
-            glDrawElementsInstanced(drawingMode, indices.value().size(), GL_UNSIGNED_INT, 0, instanceCount);
+        if (indicesCount != 0)
+            glDrawElementsInstanced(drawingMode, indicesCount, GL_UNSIGNED_INT, 0, instanceCount);
         else
-            glDrawArraysInstanced(drawingMode, 0, vertices.size(),instanceCount);
+            glDrawArraysInstanced(drawingMode, 0, verticesCount,instanceCount);
         glBindVertexArray(0);
     }
 
     void update(std::vector<TVertex> &&newVertices, std::optional<std::vector<unsigned int>> &&newIndices = {}) {
-        vertices = std::move(newVertices);
-        indices = std::move(newIndices);
 
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(TVertex), &vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, newVertices.size() * sizeof(TVertex), &newVertices[0], GL_STATIC_DRAW);
 
-        if (indices) {
+        if (newIndices) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.value().size() * sizeof(unsigned int), &indices.value()[0],
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, newIndices->size() * sizeof(unsigned int), &newIndices.value()[0],
                          GL_STATIC_DRAW);
         }
 
@@ -49,8 +47,6 @@ public:
     }
 
     void update(TVertex vertex, int i) {
-        vertices[i] = vertex;
-
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, i * sizeof(TVertex), sizeof(TVertex), &vertex);
@@ -62,7 +58,7 @@ private:
     //  render data
     unsigned int VAO, VBO, EBO;
 
-    void setupMesh() {
+    void setupMesh(std::vector<TVertex> vertices, std::optional<std::vector<unsigned int>> indices) {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);

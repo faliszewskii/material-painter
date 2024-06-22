@@ -1,9 +1,16 @@
 [submodule "dep/imgui"]
 	path = dep/imgui
 	url = git@github.com:ocornut/imgui.git
+	branch = master
 [submodule "dep/texture-atlas-generator"]
 	path = dep/texture-atlas-generator
 	url = git@github.com:faliszewskii/texture-atlas-generator.git
+	branch = master
 [submodule "dep/mixbox"]
 	path = dep/mixbox
 	url = git@github.com:scrtwpns/mixbox.git
+	branch = master
+[submodule "dep/nativefiledialog-extended"]
+	path = dep/nativefiledialog-extended
+	url = https://github.com/btzy/nativefiledialog-extended.git
+	branch = master

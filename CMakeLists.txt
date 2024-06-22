@@ -26,12 +26,6 @@ set(IMGUI_SRC
         ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 
-# Texture atlas generator
-set(TAG_DIR ${CMAKE_SOURCE_DIR}/dep/texture-atlas-generator)
-set(TAG_SRC
-        ${TAG_DIR}/library.cpp
-)
-
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/dep/inc)
 
@@ -56,13 +50,29 @@ set(APP_SRC
         src/app/Scene.cpp
         src/app/Scene.h
         src/app/entity/light/PointLight.h
-        src/app/entity/point/Point.h)
+        src/app/entity/point/Point.h
+        src/app/entity/cylinder/Cylinder.cpp
+        src/app/entity/cylinder/Cylinder.h
+        src/interface/logger/Logger.h
+        src/opengl/texture/Texture.cpp
+        src/opengl/texture/Texture.h
+        src/opengl/texture/common.cpp
+        src/model/model/Model.cpp
+        src/model/model/Model.h
+        src/interface/import/ModelImporter.cpp
+        src/interface/import/ModelImporter.h
+        src/model/material/Material.cpp
+        src/model/material/Material.h
+        src/model/transformation/Transformation.cpp
+        src/model/transformation/Transformation.h
+        src/model/renderer/ModelRenderer.cpp
+        src/model/renderer/ModelRenderer.h
+)
 
 # Add executables
 add_executable(Material_Painter
         # Dependencies
         ${IMGUI_SRC}
-        ${TAG_SRC}
         ${CMAKE_SOURCE_DIR}/src/glad.c
         # Application
         ${CMAKE_SOURCE_DIR}/src/main.cpp
@@ -99,5 +109,14 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")          # Linux
             -lXrandr
             -lXi
             -ldl
+            -lassimp
+            nfd
     )
 endif()
+
+set(TAG_DIR ${CMAKE_SOURCE_DIR}/dep/texture-atlas-generator)
+add_subdirectory(${TAG_DIR})
+target_link_libraries(Material_Painter texture_atlas_generator)
+target_include_directories(Material_Painter PUBLIC ${TAG_DIR})
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/dep/nativefiledialog-extended)
